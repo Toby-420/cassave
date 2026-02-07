@@ -19,7 +19,7 @@ To reverse this, simply use `cassave -i output.wav`
 If encoding with parameters as outlined below, you MUST use them to decode as well.
 This is outlined in Limitations.
 
-###Configuration
+### Configuration
 Bitrate is changed using the `-b` flag.
 
 It accepts values from 1 (very slow, highly stable) to 5 (super fast, not stable for analogue).
