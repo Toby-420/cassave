@@ -1,0 +1,20 @@
+
+Example usage:
+
+cassave -i myFile.txt
+  This will encode myFile.txt into myFile.wav using 44.1kHz (CD) sample rate, 1000Hz and 2000Hz bit tones, bit rate of 200bps, with no compression.
+cassave -i myFile.wav
+  This will decode myFile.wav back into myFile.txt using the options provided above.
+
+Notes:
+
+Using -b 5 (2500bps) is not recommended for analogue as the response time of the media may not be suitable. Even so, this lets 1K of data take up
+  around 3 seconds of audio. For a 15 minute standard computer cassette (not entirely recommended due to response time), this is 300K of data.
+  For a 74 minute CD, that is 1480K (!) of data. For those interested, that lets cassave encode itself into a 1 minute and 23 second audio file.
+
+WAV FILES CANNOT BE ENCODED. THIS IS WHY:
+Cassave does not rely on the file extension to figure out if the file is normal or encoded, it checks the file header.
+Since all Cassave-encoded files are wav files, it will automatically assume that the file is to be decoded and then fail when no header is found.
+Please use a different type of file to encode your audio before using Cassave (FLAC, MP3, OGG) and this will not be a problem.
+This may be fixed in the future, so watch this space!
+
