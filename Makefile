@@ -76,7 +76,7 @@ dist-gui: $(BIN_GUI)
 	cp $(BIN_GUI) $(BIN_CLI) $(RELEASE)/$(NAME_GUI)-$(VERSION)/
 	cp README.MD COPYING $(RELEASE)/$(NAME_GUI)-$(VERSION)/
 	echo $(VERSION) > ./text/VERSION
-	cp -r ./text/ $(RELEASE)/$(NAME_CLI)-$(VERSION)/
+	cp -r ./text/ $(RELEASE)/$(NAME_GUI)-$(VERSION)/
 
 tar-gui:
 	tar -C $(RELEASE) -czf $(RELEASE)/$(NAME_GUI)-$(VERSION).tar.gz $(NAME_GUI)-$(VERSION)

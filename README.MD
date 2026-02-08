@@ -59,9 +59,7 @@ File sizes:
 cassave uses libm (for maths) and libsndfile (for parsing the audio).
 
 ## Build
-Just run `make` and it'll create the CLI version and a flaky X11 GUI version.
-
-Run `make CLI` to just make the CLI version
+Just run `make release` and it'll create the CLI version and a flaky X11 GUI version.
 
 ## Limitations
 There are plenty.
