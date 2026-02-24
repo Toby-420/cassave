@@ -19,7 +19,7 @@ SRC_GUI		:= src/gui.c src/utils.c
 BIN_CLI		:= $(BUILD)/$(NAME_CLI)
 BIN_GUI		:= $(BUILD)/$(NAME_GUI)
 
-.PHONY: all clean release release-cli release-gui dist-cli dist-gui tar-cli tar-gui 7z-cli 7z-gui
+.PHONY: all clean release release-cli release-gui dist-cli dist-gui tar-cli tar-gui 7z-cli 7z-gui tidy
 
 #------------------------------------------------------------
 #default build only cli
@@ -41,6 +41,8 @@ $(BUILD):
 #clean
 clean:
 	rm -rf $(BUILD) $(RELEASE)
+tidy:
+	rm -rf $(BUILD)
 
 #------------------------------------------------------------
 #full release

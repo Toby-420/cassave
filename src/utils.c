@@ -9,8 +9,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <libintl.h>
-#include <locale.h>
 #include <ctype.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -128,7 +126,7 @@ formatFilename(char *fileNameIn)
 
   for (size_t i = 0; i < nameLen; i++)
   {
-    name[i] = toupper((unsigned char)fileNameIn[i]);
+    name[i] = (unsigned char)fileNameIn[i];
   }
 
   // Copy extension (after dot)
@@ -141,7 +139,7 @@ formatFilename(char *fileNameIn)
 
     for (size_t i = 0; i < extLen; i++)
     {
-      ext[i] = toupper((unsigned char)dot[1 + i]);
+      ext[i] = (unsigned char)dot[1 + i];
     }
   }
 

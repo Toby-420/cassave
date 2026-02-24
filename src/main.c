@@ -38,8 +38,6 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdlib.h>
-#include <libintl.h>
-#include <locale.h>
 #include <stdint.h> /* for uintx_t */
 #include <inttypes.h>
 
@@ -49,10 +47,6 @@ enum InfoFiles {
   HELP_FILE = 1,
   VERSION_FILE,
   WARRANTY_FILE,
-};
-
-enum OptionsWithoutShortCode {
-  OPT_VERBOSE = 1000,
 };
 
 #define _(str) gettext(str)
@@ -65,8 +59,8 @@ option long_options[] =
   { "help", no_argument, NULL, 'h' }, 
   // argument '--help' takes no additional arguments and has short code 'h'
 
-  { "verbose", no_argument, NULL, OPT_VERBOSE }, 
-  // argument '--verbose' takes no additional arguments and has no short code
+  { "verbose", no_argument, NULL, 'V' },
+  // argument '--verbose' takes no additional arguments and has short code 'V'
   
   { "input", required_argument, NULL, 'i' }, 
   // argument '--input' takes 1 required argument and has short code 'i'
@@ -109,7 +103,7 @@ main (int argc, char **argv)
   uint8_t sampleRate = 4;
 
   // Take in user inputs using getopt_long from the GNU utils
-  while ((opt = getopt_long(argc, argv, "i:o:vhrwb:f:s:", long_options, NULL)) != -1)
+  while ((opt = getopt_long(argc, argv, "i:o:vhrwb:f:s:V", long_options, NULL)) != -1)
   {
     switch (opt) 
     {
@@ -151,6 +145,12 @@ main (int argc, char **argv)
       //   if (verbose) printf("Compression Mode: %"PRIu8"\n", compressionFlag);
       //   break;
       case 'b':
+        if (atoi(optarg) < 1 || atoi(optarg) > 5)
+        {
+          printf("Bitrate out of range\n");
+          return -1;
+        }
+
         bitrate = atoi(optarg);
         // if (strncmp(optarg, "XLOW", 4) || atoi(optarg) == 0)
         // {
@@ -176,7 +176,13 @@ main (int argc, char **argv)
         // }
         break;
       case 'f':
+        if (atoi(optarg) < 1 || atoi(optarg) > 5)
+        {
+          printf("Frequency out of range\n");
+          return -1;
+        }
         bitFrequency = atoi(optarg);
+
         // if (strncmp(optarg, "XLOW", 4) || atoi(optarg) == 0)
         // {
         //   bitFrequency = 0;
@@ -201,6 +207,11 @@ main (int argc, char **argv)
         // }
         break;
       case 's':
+        if (atoi(optarg) < 1 || atoi(optarg) > 11 )
+        {
+          printf("Sample rate out of range\n");
+          return -1;
+        }
         sampleRate = atoi(optarg);
         // if (strncmp(optarg, "TELE", 4) || atoi(optarg) == 0)
         // {
@@ -245,7 +256,7 @@ main (int argc, char **argv)
         // }
         break;
       // Turn verbose on if necessary
-      case OPT_VERBOSE:
+      case 'V':
         verbose = true;
         break;
       // If not recognised, return -1 (error)

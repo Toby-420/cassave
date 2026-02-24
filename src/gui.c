@@ -41,12 +41,13 @@ int main(void)
   int sampleRate = 4;
     
   // where text inputs are stored
-  char fileInput[260]; // maximum file length for most systems
-  char fileOutput[15]; // max file length is 11, space for padding
+  char fileInput[260] = {"\0"}; // maximum file length for most systems
+  char fileOutput[15] = {"\0"}; // max file length is 11, space for padding
   
   // if text boxes are currently used
   bool fileInputEditMode = false;
   bool fileOutputEditMode = false;
+  int textDisplay = 0;
 
   // Only close the window if told to
   while (!WindowShouldClose())
@@ -54,6 +55,8 @@ int main(void)
     // Draw the window
     BeginDrawing();
       ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+
+
 
       if (GuiButton((Rectangle){2, 2, 50, 20}, "#193#Help"))
       {
@@ -136,9 +139,6 @@ int main(void)
         {
           fileOutputEditMode = !fileOutputEditMode;
         }
-
-        int textDisplay = 0;
-
         switch (textDisplay)
         {
           case 0:
@@ -158,8 +158,10 @@ int main(void)
             break;
 
         }
+
         if (GuiButton((Rectangle){20, 130, 110, 20}, "Process!"))
         {
+          textDisplay = 0;
           // File to be input
           uint8_t *fileData = NULL;
           // Where the headers are stored
