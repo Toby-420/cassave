@@ -3,7 +3,7 @@ NAME_GUI	:= cassave-gui
 VERSION		?= dev
 
 CC		:= gcc
-CFLAGS		:= -Wall
+CFLAGS		:= -Wall 
 CLDFLAGS	:= -lm -lsndfile
 GUIFLAGS	:= -Wall
 GUILDFLAGS	:= -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -lsndfile

@@ -18,7 +18,6 @@
 #include <math.h>
 
 #define CASSAVE_VERSION 1
-#define TOLERANCE 50
 
 // Common shorthand for string localisation
 #define _(str) gettext(str)
@@ -635,7 +634,7 @@ int decodeCassaveWav(const char *wavFile,
   );
 
   uint8_t *bytes;
-  size_t numBytes = bitsToBytes(bits, numBits, &bytes);
+  bitsToBytes(bits, numBits, &bytes);
 
   /* ---- parse header ---- */
   if (verbose) printf("Parsing Header... ");

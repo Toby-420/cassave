@@ -16,6 +16,14 @@
 
 int verbose = false;
 
+// let simple numbers be used to describe windows
+enum ProgramWindow {
+  NONE_MENU = 0,
+  HELP_MENU,
+  INFO_MENU,
+  SETTING_MENU
+};
+
 int main(void)
 {
   // Initialise window of 860x640px with a title
@@ -30,9 +38,7 @@ int main(void)
   SetTargetFPS(60);
 
   // additional menus should be closed by default
-  bool showHelp = false;
-  bool showInfo = false;
-  bool showSettings = false;
+  uint8_t windowShow = NONE_MENU;
   
   // dropdown menus should have defaults
   int compressionAlgorithm = 1; // LZMA level 5
@@ -60,37 +66,31 @@ int main(void)
 
       if (GuiButton((Rectangle){2, 2, 50, 20}, "#193#Help"))
       {
-        showHelp = true;
-        showInfo = false;
-        showSettings = false;
+        windowShow = HELP_MENU;
       } else if (GuiButton((Rectangle){54, 2, 50, 20}, "#191#Info")) 
       {
-        showInfo = true;
-        showHelp = false;
-        showSettings = false;
+        windowShow = INFO_MENU;
       } else if (GuiButton((Rectangle){106, 2, 75, 20}, "#22#Settings"))
       {
-        showSettings = true;
-        showInfo = false;
-        showHelp = false;
+        windowShow = SETTING_MENU;
       }
 
-      if (showHelp)
+      if (windowShow == HELP_MENU)
       {
         int result = GuiMessageBox((Rectangle){50, 50, 250, 120},
             "#193#Help", "Help can be found in README.MD", "Okay");
 
-        if (result >= 0) showHelp = false;
+        if (result >= 0) windowShow = NONE_MENU;
 
-      } else if (showInfo)
+      } else if (windowShow == INFO_MENU)
       {
         int result = GuiMessageBox((Rectangle){50, 50, 250, 200},
             "#191#Info", "Copyright (C) 2025 Toby Valentine.\nLicensed under GNU" 
             " GPLv3.\nSee COPYING for more information", "Okay");
 
-        if (result >= 0) showInfo = false;
+        if (result >= 0) windowShow = NONE_MENU;
       
-      } else if (showSettings)
+      } else if (windowShow == SETTING_MENU)
       {
         int result = GuiMessageBox((Rectangle){50, 50, 400, 300},
             "#22#Settings", "", "Okay");
@@ -126,7 +126,7 @@ int main(void)
         //   // Create .cfg file for these settings with json.
         // }
 
-        if (result >= 0) showSettings = false;
+        if (result >= 0) windowShow = NONE_MENU;
       } else
       {
         GuiLabel((Rectangle){20, 30, 100, 20}, "Input file:");
