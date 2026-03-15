@@ -53,7 +53,8 @@ dkms.conf
 
 release/
 
-bin/*
+bin/
+pkg/
 
 text/VERSION
 

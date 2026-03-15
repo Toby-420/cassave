@@ -1,5 +1,5 @@
 /*
- * cassave utils
+ * cassave gui (a.k.a. cassie)
  * Copyright (C) 2025 - 2026 Toby Valentine
  *
  * This program is free software: you can redistribute it and/or modify
@@ -7,15 +7,13 @@
  * the Free Software Foundation, either version 3 of the license, or
  * (at your option) any later version.*/
 
-#include "../include/raylib.h"
+#include <gtk/gtk.h>
 
-#define RAYGUI_IMPLEMENTATION
-#include "../include/raygui.h"
-#include "../include/style_amber.h"
 #include "../include/utils.h"
 
 int verbose = false;
 
+<<<<<<< Updated upstream
 // let simple numbers be used to describe windows
 enum ProgramWindow {
   NONE_MENU = 0,
@@ -25,13 +23,15 @@ enum ProgramWindow {
 };
 
 int main(void)
+=======
+static void
+activate (GtkApplication *app,
+          gpointer        user_data)
+>>>>>>> Stashed changes
 {
-  // Initialise window of 860x640px with a title
-  InitWindow(860, 640, "cassave - Data to Audio Converter");
-  
-  // Initialise amber style
-  GuiLoadStyleAmber();
+  GtkWidget *window;
 
+<<<<<<< Updated upstream
 
   // Don't need insane frames per second, 60 will give good performance
   // with smooth input
@@ -452,4 +452,25 @@ int main(void)
   }
   CloseWindow();
   return 0;
+=======
+  window = gtk_application_window_new (app);
+  gtk_window_set_title (GTK_WINDOW (window), "cassie - GUI frontend for cassave");
+  gtk_window_set_default_size (GTK_WINDOW (window), 200, 200);
+  gtk_window_present (GTK_WINDOW (window));
+}
+
+int
+main (int    argc,
+      char **argv)
+{
+  GtkApplication *app;
+  int status;
+
+  app = gtk_application_new ("org.valentine.cassie", G_APPLICATION_DEFAULT_FLAGS);
+  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  status = g_application_run (G_APPLICATION (app), argc, argv);
+  g_object_unref (app);
+
+  return status;
+>>>>>>> Stashed changes
 }

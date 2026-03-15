@@ -57,23 +57,23 @@ displayInfo (int toDisplay) {
   // the contents
   FILE *file;
   int bufferSize;
-  char fileToOpen[20];
+  char fileToOpen[33];
   switch (toDisplay) {
     case 1:
       bufferSize = 100;
-      snprintf (fileToOpen, 20, "./text/HELP");
+      snprintf (fileToOpen, 29, "/usr/share/cassave/text/HELP");
       break;
     case 2:
       bufferSize = 8;
-      snprintf(fileToOpen, 20, "./text/VERSION");
+      snprintf(fileToOpen, 32, "/usr/share/cassave/text/VERSION");
       break;
     case 3:
       bufferSize = 100;
-      snprintf (fileToOpen, 20, "./text/WARRANTY");
+      snprintf (fileToOpen, 33, "/usr/share/cassave/text/WARRANTY");
       break;
     default:
       bufferSize = 0;
-      snprintf (fileToOpen, 20, "./text/HELP");
+      snprintf (fileToOpen, 29, "/usr/share/cassave/text/HELP");
       break;
   }
   char fileContents[bufferSize];

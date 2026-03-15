@@ -292,70 +292,11 @@ main (int argc, char **argv)
     // Decode
     printf("WAV file detected. Decoding.\n");
 
-    int actualBitrate = 0;
-    switch (bitrate)
-    {
-      case 0:
-        // Extra Low
-        actualBitrate = 1;
-        break;
-      case 1:
-        // Low
-        actualBitrate = 10;
-        break;
-      case 2:
-        // Medium
-        actualBitrate = 200;
-        break;
-      case 3:
-        // High
-        actualBitrate = 500;
-        break;
-      case 4:
-        // Really high
-        actualBitrate = 1000;
-        break;
-      case 5:
-        // Extremely high
-        actualBitrate = 2500;
-        break;
-      default:
-        // Default value is 200 / medium
-        actualBitrate = 200;
-        break;
-    }
-    uint16_t actualFrequency = 0;
-    switch (bitFrequency)
-    {
-      case 0:
-        // Extra Low
-        actualFrequency = 100;
-        break;
-      case 1:
-        // Low
-        actualFrequency = 400;
-        break;
-      case 2:
-        // Medium
-        actualFrequency = 1000;
-        break;
-      case 3:
-        // High
-        actualFrequency = 2000;
-        break;
-      case 4:
-        // Really high
-        actualFrequency = 8000;
-        break;
-      case 5:
-        // Extremely high
-        actualFrequency = 22000;
-        break;
-      default:
-        // Default value is 1000 / medium
-        actualFrequency = 1000;
-        break;
-    }
+    int bitrateList[] = {1, 10, 200, 500, 1000, 2500};
+    int actualBitrate = bitrateList[bitrate];
+
+    int frequencyList[] = {100, 400, 1000, 2000, 8000, 22000};
+    int actualFrequency = frequencyList[bitFrequency];
 
     decodeCassaveWav(inputFile, actualBitrate, actualFrequency);
 
@@ -417,82 +358,14 @@ main (int argc, char **argv)
     memcpy(outputBuffer + offset, &checksum, sizeof(uint32_t));
     if (verbose) printf("Done\n");
 
-    // Convert bits to numbers
-    // Allocate frequency according to chosen value
-    uint16_t actualFrequency = 0;
-    switch (bitFrequency)
-    {
-      case 0:
-        // Extra Low
-        actualFrequency = 100;
-        break;
-      case 1:
-        // Low
-        actualFrequency = 400;
-        break;
-      case 2:
-        // Medium
-        actualFrequency = 1000;
-        break;
-      case 3:
-        // High
-        actualFrequency = 2000;
-        break;
-      case 4:
-        // Really high
-        actualFrequency = 8000;
-        break;
-      case 5:
-        // Extremely high
-        actualFrequency = 22000;
-        break;
-      default:
-        // Default value is 1000 / medium
-        actualFrequency = 1000;
-        break;
-    }
-    // Allocate space for each frequency
-    size_t expandedSize = totalSize * 8;
-    if (verbose) printf("Allocating frequency space... ");
-    uint16_t *expandedBuffer = malloc(expandedSize * sizeof(uint16_t));
-    expandBitsToFreq(outputBuffer, totalSize, expandedBuffer, actualFrequency);
-    if (verbose) printf("Done\n");
+    int bitrateList[] = {1, 10, 200, 500, 1000, 2500};
+    int actualBitrate = bitrateList[bitrate];
 
-    // Convert numbers to tones + write file
-    int actualBitrate = 200;
-    switch (bitrate)
-    {
-      case 0:
-        // Extra Low
-        actualBitrate = 1;
-        break;
-      case 1:
-        // Low
-        actualBitrate = 10;
-        break;
-      case 2:
-        // Medium
-        actualBitrate = 200;
-        break;
-      case 3:
-        // High
-        actualBitrate = 500;
-        break;
-      case 4:
-        // Really high
-        actualBitrate = 1000;
-        break;
-      case 5:
-        // Extremely high
-        actualBitrate = 2500;
-        break;
-      default:
-        // Default value is 200 / medium
-        actualBitrate = 200;
-        break;
-    }
+    int frequencyList[] = {100, 400, 1000, 2000, 8000, 22000};
+    int actualFrequency = frequencyList[bitFrequency];
 
-    int actualSamplerate = 0;
+    int samplerateList[] = {8000, 11025, 16000, 22050, 44100, 48000, 88200, 96000, 176400, 192000, 352000, 384000};
+    int actualSamplerate = samplerateList[sampleRate];
     // Just a quick rant here:
     // We can only hear up to 20000Hz right and
     // the maximum frequency that can be played
@@ -504,61 +377,14 @@ main (int argc, char **argv)
     // every single frequency we can hear and
     // more (for some lee-way). Marketing.
     // That's why...
-    switch (sampleRate)
-    {
-      case 0:
-        // Telephone
-        actualSamplerate = 8000;
-        break;
-      case 1:
-        // Subwoofer
-        actualSamplerate = 11025;
-        break;
-      case 2:
-        // VOIP
-        actualSamplerate = 16000;
-        break;
-      case 3:
-        // MPEG
-        actualSamplerate = 22050;
-        break;
-      case 4:
-        // CD
-        actualSamplerate = 44100;
-        break;
-      case 5:
-        // DVD
-        actualSamplerate = 48000;
-        break;
-      case 6:
-        // Mastering
-        actualSamplerate = 88200;
-        break;
-      case 7:
-        // Blu-Ray
-        actualSamplerate = 96000;
-        break;
-      case 8:
-        // HDCD
-        actualSamplerate = 176400;
-        break;
-      case 9:
-        // "Professional"
-        actualSamplerate = 192000;
-        break;
-      case 10:
-        // DxD (lmfao)
-        actualSamplerate = 352800;
-        break;
-      case 11:
-        // maximum PCM Frequency
-        actualSamplerate = 384000;
-        break;
-      default:
-        // Default value is 44100 / CD quality
-        actualSamplerate = 44100;
-        break;
-    }
+
+    // Allocate space for each frequency
+    size_t expandedSize = totalSize * 8;
+    if (verbose) printf("Allocating frequency space... ");
+    uint16_t *expandedBuffer = malloc(expandedSize * sizeof(uint16_t));
+    expandBitsToFreq(outputBuffer, totalSize, expandedBuffer, actualFrequency);
+    if (verbose) printf("Done\n");
+
 
 
     size_t numSamples;
