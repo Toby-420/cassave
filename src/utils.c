@@ -61,19 +61,19 @@ displayInfo (int toDisplay) {
   switch (toDisplay) {
     case 1:
       bufferSize = 100;
-      snprintf (fileToOpen, 29, "/usr/share/cassave/text/HELP");
+      snprintf (fileToOpen, 29, "/usr/share/cassave/HELP");
       break;
     case 2:
       bufferSize = 8;
-      snprintf(fileToOpen, 32, "/usr/share/cassave/text/VERSION");
+      snprintf(fileToOpen, 32, "/usr/share/cassave/VERSION");
       break;
     case 3:
       bufferSize = 100;
-      snprintf (fileToOpen, 33, "/usr/share/cassave/text/WARRANTY");
+      snprintf (fileToOpen, 33, "/usr/share/cassave/WARRANTY");
       break;
     default:
       bufferSize = 0;
-      snprintf (fileToOpen, 29, "/usr/share/cassave/text/HELP");
+      snprintf (fileToOpen, 29, "/usr/share/cassave/HELP");
       break;
   }
   char fileContents[bufferSize];

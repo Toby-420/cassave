@@ -55,6 +55,8 @@ release/
 
 bin/
 pkg/
-
+src/cassave*
+*.tar*
+*.bak
 text/VERSION
 

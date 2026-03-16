@@ -17,7 +17,7 @@ sha256sums=('SKIP')
 
 build() {
     cd "$pkgname-$pkgver"
-    make
+    make release VERSION=$pkgver
 }
 
 package() {
@@ -26,7 +26,7 @@ package() {
     install -Dm755 bin/cassave "$pkgdir/usr/bin/cassave"
 
     install -d "$pkgdir/usr/share/cassave"
-    cp -r text/* "$pkgdir/usr/share/cassave/"
+    cp -r release/cassave-$pkgver/text/* "$pkgdir/usr/share/cassave/"
 
     install -Dm644 README.MD "$pkgdir/usr/share/doc/cassave/README.MD"
 }
