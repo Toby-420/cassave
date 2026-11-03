@@ -617,75 +617,183 @@ int readWavPCM16(const char *filename,
   sf_close(sf);
   return 0;
 }
+
+// Find preamble + magic number in byte stream
+ssize_t findHeaderOffset(const uint8_t *bytes, size_t len)
+{
+  const uint32_t preamble = 0x55555555;
+  const uint32_t magic    = 0xDEADBEEF;
+
+  for (size_t i = 0; i + 8 <= len; i++) {
+    uint32_t p, m;
+
+    memcpy(&p, bytes + i, 4);
+    memcpy(&m, bytes + i + 4, 4);
+
+    if (p == preamble && m == magic) {
+      return (ssize_t)i;
+    }
+  }
+
+  return -1; // not found
+}
 int decodeCassaveWav(const char *wavFile,
                      uint32_t bitrate,
                      uint16_t baseFreq)
 {
-  int16_t *pcm;
-  size_t samples;
-  uint32_t sr;
+    int16_t *pcm = NULL;
+    uint8_t *bits = NULL;
+    uint8_t *bytes = NULL;
 
-  if (readWavPCM16(wavFile, &pcm, &samples, &sr) != 0)
+    size_t samples = 0;
+    uint32_t sr = 0;
+
+    if (readWavPCM16(wavFile, &pcm, &samples, &sr) != 0)
+        return -1;
+
+    if (bitrate == 0) {
+        fprintf(stderr, "Invalid bitrate\n");
+        goto fail;
+    }
+
+    size_t numBits = decodeBitsFromPCM(
+        pcm, samples, sr, bitrate, baseFreq, &bits
+    );
+
+    if (numBits == 0 || bits == NULL) {
+        fprintf(stderr, "Failed to decode bitstream\n");
+        goto fail;
+    }
+
+    size_t numBytes = bitsToBytes(bits, numBits, &bytes);
+
+    if (numBytes < 28) {
+        fprintf(stderr, "Decoded stream too short\n");
+        goto fail;
+    }
+
+    /* locate preamble/magic */
+    ssize_t hdrOffset = findHeaderOffset(bytes, numBytes);
+
+    if (hdrOffset < 0) {
+        fprintf(stderr,
+                "Header not found (wrong decode parameters?)\n");
+        goto fail;
+    }
+
+    if ((size_t)hdrOffset + 28 > numBytes) {
+        fprintf(stderr, "Truncated header\n");
+        goto fail;
+    }
+
+    uint32_t headerRaw[7];
+    memcpy(headerRaw, bytes + hdrOffset, sizeof(headerRaw));
+
+    uint32_t headerDecoded[5];
+    memcpy(headerDecoded, &headerRaw[2], sizeof(headerDecoded));
+
+    char dosFilename[12];
+    memset(dosFilename, 0, sizeof(dosFilename));
+
+    char realFilename[13];
+    memset(realFilename, 0, sizeof(realFilename));
+
+    uint64_t filesize = 0;
+    uint8_t compression = 0;
+    uint8_t version = 0;
+
+    if (parseHeader(headerDecoded,
+                    dosFilename,
+                    &filesize,
+                    &compression,
+                    &version) != 0)
+    {
+        fprintf(stderr, "Header parse failed\n");
+        goto fail;
+    }
+
+    dosFilename[11] = '\0';
+
+    /* sanity checks */
+
+    if (version != CASSAVE_VERSION) {
+        fprintf(stderr,
+                "Unsupported version: %u\n",
+                version);
+        goto fail;
+    }
+
+    if (compression > 3) {
+        fprintf(stderr,
+                "Invalid compression mode: %u\n",
+                compression);
+        goto fail;
+    }
+
+    unformatFilename(dosFilename, realFilename);
+
+    size_t payloadOffset = (size_t)hdrOffset + 28;
+
+    /*
+     * Need:
+     * payload
+     * + filesize bytes
+     * + 4 CRC bytes
+     */
+    if (filesize > SIZE_MAX) {
+        fprintf(stderr, "Filesize overflow\n");
+        goto fail;
+    }
+
+    if (payloadOffset + filesize + 4 > numBytes) {
+        fprintf(stderr,
+                "Decoded filesize exceeds stream length "
+                "(wrong decode parameters?)\n");
+        goto fail;
+    }
+
+    uint8_t *payload = bytes + payloadOffset;
+
+    uint32_t storedCRC;
+    memcpy(&storedCRC, payload + filesize, sizeof(storedCRC));
+
+    uint32_t calcCRC =
+        crc32_create(payload, (size_t)filesize);
+
+    if (storedCRC != calcCRC) {
+        fprintf(stderr,
+                "CRC mismatch (wrong decode parameters?)\n");
+        goto fail;
+    }
+
+    FILE *out = fopen(realFilename, "wb");
+
+    if (!out) {
+        perror("fopen");
+        goto fail;
+    }
+
+    size_t written =
+        fwrite(payload, 1, (size_t)filesize, out);
+
+    fclose(out);
+
+    if (written != (size_t)filesize) {
+        fprintf(stderr, "Write failed\n");
+        goto fail;
+    }
+
+    free(pcm);
+    free(bits);
+    free(bytes);
+
+    return 0;
+
+fail:
+    free(pcm);
+    free(bits);
+    free(bytes);
     return -1;
-
-  uint8_t *bits;
-  size_t numBits = decodeBitsFromPCM(
-    pcm, samples, sr, bitrate, baseFreq, &bits
-  );
-
-  uint8_t *bytes;
-  bitsToBytes(bits, numBits, &bytes);
-
-  /* ---- parse header ---- */
-  if (verbose) printf("Parsing Header... ");
-  uint32_t headerRaw[7];
-  memcpy(headerRaw, bytes, 28);
-
-  uint32_t headerDecoded[5];
-  memcpy(headerDecoded, &headerRaw[2], 20);
-  if (verbose) printf("Done\n");
-
-  /* 11 bytes for DOS name */
-  if (verbose) printf("Formatting filename... ");
-  char dosFilename[12];
-  memset(dosFilename, ' ', sizeof(dosFilename));
-
-  char realFilename[13] = {0};
-
-  uint64_t filesize;
-  uint8_t compression, version;
-
-  parseHeader(headerDecoded, dosFilename,
-              &filesize, &compression, &version);
-
-  unformatFilename(dosFilename, realFilename);
-  if (verbose) printf("Done\n");
-
-
-  if (verbose) printf("Comparing checksums... ");
-  uint8_t *payload = bytes + 28;
-  uint32_t storedCRC;
-  memcpy(&storedCRC, payload + filesize, 4);
-
-  uint32_t calcCRC = crc32_create(payload, filesize);
-
-  if (storedCRC != calcCRC) {
-    fprintf(stderr, "CRC mismatch\n");
-    return -1;
-  }
-  if (verbose) printf("Done\n");
-
-  if (verbose) printf("Writing file... ");
-  FILE *out = fopen(realFilename, "wb");
-  fwrite(payload, 1, filesize, out);
-  fclose(out);
-  if (verbose) printf("Done\n");
-
-  free(pcm);
-  free(bits);
-  free(bytes);
-
-  return 0;
 }
 
 

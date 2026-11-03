@@ -1,0 +1,32 @@
+NAME		:= cassave
+VERSION		?= dev
+
+CC		:= gcc
+FLAGS		:= -Wall
+LDFLAGS		:= -lm -lsndfile
+
+
+BUILD		:= bin
+
+SRC_CLI		:= src/*
+
+BIN_CLI		:= $(BUILD)/$(NAME)
+
+.PHONY: all
+
+#------------------------------------------------------------
+#default build only cli
+
+all: $(BIN)
+
+$(BIN): $(SRC) | $(BUILD)
+	$(CC) $(FLAGS) -o $@ $(SRC) $(LDFLAGS)
+	strip $@
+
+$(BUILD):
+	mkdir -p $@
+
+#-------------------------------------------------------------
+#clean
+clean:
+	rm -rf  $(BUILD)

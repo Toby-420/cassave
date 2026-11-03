@@ -59,8 +59,16 @@ size_t
 bitsToBytes(const uint8_t *bits, size_t numBits, uint8_t **outBytes);
 int
 readWavPCM16(const char *filename, int16_t **samples, size_t *numSamples, uint32_t *sampleRate);
+ssize_t
+findHeaderOffset(const uint8_t *bytes, size_t len);
 int
 decodeCassaveWav(const char *wavFile, uint32_t bitrate, uint16_t baseFreq);
+size_t
+repackBitsAligned(const uint8_t *bits, size_t numBits, int bitOffset, uint8_t **outBytes);
+ssize_t
+findMagicOffset(const uint8_t *bytes, size_t len);
+int
+findCassaveFrame(const uint8_t *bits, size_t numBits, uint8_t **alignedBytes, size_t *alignedLen, size_t *magicOffset);
 
 //DEV
 void

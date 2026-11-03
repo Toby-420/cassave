@@ -2,6 +2,7 @@
 ## Overview
 cassave is a utility to turn digital files into audio that can be recorded onto physical media.
 It also reverses to process to produce the exact file that was put in.
+I wrote it for my Computer Science A Level NEA.
 
 ## Features
 - Configurable bitrate, frequency, and samplerate
